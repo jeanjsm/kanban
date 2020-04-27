@@ -1,0 +1,4 @@
+.DS_Store
+
+/kanban-api/node_modules
+/kanban-api/.env
