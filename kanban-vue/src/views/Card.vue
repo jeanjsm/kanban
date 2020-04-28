@@ -4,17 +4,64 @@
     <p>{{ card.title }}</p>
     <img src="https://api.adorable.io/avatars/50/abott@adorable.png" alt="" />
     <v-btn @click="remove" text>Delete</v-btn>
+    <v-dialog v-model="dialog" width="800">
+      <template v-slot:activator="{ on }">
+        <v-btn color="red lighten-2" dark v-on="on">
+          Click Me
+        </v-btn>
+      </template>
+
+      <v-card>
+        <v-card-title class="headline justify-space-between" primary-title>
+          <p class="my-auto title">{{ card.title }}</p>
+          <v-btn class="my-auto" icon>X</v-btn>
+        </v-card-title>
+
+        <v-card-text>
+          <div>
+            <p>Description</p>
+            <v-textarea outlined label="Type some detailed description..."></v-textarea>
+          </div>
+          <custom-input inputLabel="Type some detailed description..." buttonLabel="Save"></custom-input>
+          <div>
+            <p>Activity</p>
+            <v-list dense>
+              <v-list-item-group>
+                <v-list-item>Test</v-list-item>
+                <v-list-item>Test</v-list-item>
+                <v-list-item>Test</v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </div>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="dialog = false">
+            I accept
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
+import CustomInput from "../components/CustomInput";
 import CardService from "../services/card.service";
 export default {
+  components: {
+    CustomInput
+  },
   props: {
     card: {},
   },
   data() {
-    return {};
+    return {
+      showDetails: true,
+    };
   },
   methods: {
     async remove() {
