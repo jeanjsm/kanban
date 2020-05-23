@@ -5,6 +5,10 @@ export default class CardService {
     return api.get("/cards?list_id=" + list_id);
   }
 
+  static findCard(card_id) {
+    return api.get("/cards/" + card_id);
+  }
+
   static createCard(card, user_id) {
     return api.post("/cards", { list_id: card.list_id, title: card.title }, { headers: { user_id } });
   }

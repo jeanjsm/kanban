@@ -1,69 +1,42 @@
 <template>
-  <div class="card">
-    <div class="header"></div>
-    <p>{{ card.title }}</p>
-    <img src="https://api.adorable.io/avatars/50/abott@adorable.png" alt="" />
-    <v-btn @click="remove" text>Delete</v-btn>
-    <v-dialog v-model="dialog" width="800">
-      <template v-slot:activator="{ on }">
-        <v-btn color="red lighten-2" dark v-on="on">
-          Click Me
-        </v-btn>
-      </template>
-
-      <v-card>
-        <v-card-title class="headline justify-space-between" primary-title>
-          <p class="my-auto title">{{ card.title }}</p>
-          <v-btn class="my-auto" icon>X</v-btn>
-        </v-card-title>
-
-        <v-card-text>
-          <div>
-            <p>Description</p>
-            <v-textarea outlined label="Type some detailed description..."></v-textarea>
-          </div>
-          <custom-input inputLabel="Type some detailed description..." buttonLabel="Save"></custom-input>
-          <div>
-            <p>Activity</p>
-            <v-list dense>
-              <v-list-item-group>
-                <v-list-item>Test</v-list-item>
-                <v-list-item>Test</v-list-item>
-                <v-list-item>Test</v-list-item>
-              </v-list-item-group>
-            </v-list>
-          </div>
-        </v-card-text>
-
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="dialog = false">
-            I accept
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+  <v-card class="card" @click="loadCard">
+    <v-card-title>{{ card.title }}</v-card-title>
+    <v-card-text>
+      <div>
+        <span>{{ card.owner }}</span>
+      </div>
+      <v-img src="https://api.adorable.io/avatars/285/abott@adorable.png" alt="" width="30" style="border-radius: 24px" />
+    </v-card-text>
+    <v-dialog v-model="showDetails">
+      <card-detail :card="detail" />
     </v-dialog>
-  </div>
+  </v-card>
 </template>
 
 <script>
-import CustomInput from "../components/CustomInput";
 import CardService from "../services/card.service";
+import CardDetail from "../views/CardDetail";
 export default {
   components: {
-    CustomInput
+    CardDetail
   },
   props: {
     card: {},
   },
   data() {
     return {
-      showDetails: true,
+      showDetails: false,
+      detail: {}
     };
   },
+  mounted() {
+  },
   methods: {
+    async loadCard() {
+      const { data } = await CardService.findCard(this.card._id);
+      this.detail = data;
+      this.showDetails = true;
+    },
     async remove() {
       await CardService.delete(this.card);
       // this.$store.commit("removeCardFromList", this.card);
@@ -74,32 +47,9 @@ export default {
 
 <style scoped>
 .card {
-  position: relative;
-  background: #fff;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  padding: 15px;
-  box-shadow: 0 1px 4px 0 rgba(192, 208, 230, 0.8);
-  border-top: 20px solid rgba(230, 236, 245, 0.4);
-  cursor: grab;
+  margin: 5px 0;
 }
-
-.header {
-  position: absolute;
-  top: -22px;
-  left: 15px;
-}
-
-p {
-  font-weight: 500;
-  line-height: 20px;
-  font-size: 14px;
-}
-
-img {
-  width: 24px;
-  height: 24px;
-  border-radius: 2px;
-  margin-top: 5px;
+.card-header {
+  border-top: 5px solid red;
 }
 </style>

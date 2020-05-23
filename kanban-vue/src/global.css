@@ -7,12 +7,11 @@
 
 html, body, #app {
   height: 100%;
+  background: #f7fafc33;
 }
 
 body {
   font: 14px 'Roboto', sans-serif;
-  background: #ecf1f8;
-  color: #ccc;
   -webkit-font-smoothing: antialiased !important;
 }
 

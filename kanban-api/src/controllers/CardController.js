@@ -1,7 +1,7 @@
-const axios = require('axios');
-const Card = require('../models/Card');
-const List = require('../models/List');
-const User = require('../models/User');
+const axios = require("axios");
+const Card = require("../models/Card");
+const List = require("../models/List");
+const User = require("../models/User");
 
 module.exports = {
   async index(request, response) {
@@ -10,12 +10,35 @@ module.exports = {
     const list = await List.findById(list_id);
 
     if (!list) {
-      return response.status(400).json({ error: 'list does not exists' });
+      return response.status(400).json({ error: "list does not exists" });
     }
 
-    const cards = await Card.find({ list: list_id });
+    Card.find({ list: list_id })
+      .populate({
+        path: "owner",
+      })
+      .populate({
+        path: "label",
+      })
+      .exec(function (err, data) {
+        if (err) response.status(400).json({ error: "Card not found" });
+        return response.json(data);
+      });
+  },
 
-    return response.json(cards);
+  async findCard(request, response) {
+    const { card_id } = request.params;
+    Card.findOne({ _id: card_id })
+      .populate({
+        path: "owner",
+      })
+      .populate({
+        path: "label",
+      })
+      .exec(function (err, data) {
+        if (err) response.status(400).json({ error: "Card not found" });
+        return response.json(data);
+      });
   },
 
   async store(request, response) {
@@ -25,13 +48,13 @@ module.exports = {
     const user = await User.findById(user_id);
 
     if (!user) {
-      return response.status(400).json({ error: 'User does not exists' });
+      return response.status(400).json({ error: "User does not exists" });
     }
 
     const list = await List.findById(list_id);
 
     if (!list) {
-      return response.status(400).json({ error: 'List does not exists' });
+      return response.status(400).json({ error: "List does not exists" });
     }
 
     const card = await Card.create({ title, list: list_id, owner: user_id });
@@ -40,10 +63,19 @@ module.exports = {
 
   async update(request, response) {
     const newCard = request.body;
-    await Card.findByIdAndUpdate(newCard._id, newCard, function(err, doc) {
-      if (err) return response.status(500).json({ error: 'Error updating ' + newCard.title });
-      return response.json({ message: 'Succesfully saved.' })
+
+    await Card.findByIdAndUpdate(newCard._id, newCard, function (err, card) {
+      if (err)
+        return response
+          .status(500)
+          .json({ error: "Error updating " + newCard.title });
+      // return response.json(card);
     });
+
+    const card = await Card.findById(newCard._id).populate({
+      path: "label",
+    });
+    return response.json(card);
   },
 
   async added(request, response) {
@@ -54,9 +86,10 @@ module.exports = {
 
   async delete(request, response) {
     const { id } = request.query;
-    await Card.findByIdAndDelete(id, function(err, doc) {
-      if (err) return response.status(500).json({ error: 'Error removing ' + id });
-      return response.json({ message: 'Succesfully saved.' })
+    await Card.findByIdAndDelete(id, function (err, doc) {
+      if (err)
+        return response.status(500).json({ error: "Error removing " + id });
+      return response.json({ message: "Succesfully saved." });
     });
-  }
-}
+  },
+};

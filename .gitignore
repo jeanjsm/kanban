@@ -1,4 +1,8 @@
-.DS_Store
-
-/kanban-api/node_modules
-/kanban-api/.env
+.idea/.gitignore
+.idea/kanban.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/Project_Default.xml
+kanban-api/node_modules/
+kanban-api/tmp/uploads/*

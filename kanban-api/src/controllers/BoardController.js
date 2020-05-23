@@ -2,10 +2,19 @@ const axios = require('axios');
 const Board = require('../models/Board');
 const User = require('../models/User');
 
-module.exports = {
-  async index(request, response) {
-    const boards = await Board.find();
 
+module.exports = {
+  async findById(request, response) {
+    Board.findById(request.params.board_id, function(err, board) {
+      if (err) {
+        return response.status(400).json({ error: 'Board not found' });
+      }
+      return response.json(board);
+    });
+  },
+  async index(request, response) {
+    const { user_id } = request.headers;
+    const boards = await Board.find({ owner: user_id });
     return response.json(boards);
   },
 
