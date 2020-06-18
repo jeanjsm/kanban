@@ -35,7 +35,17 @@
             class="custom-file-input"
             @change="fillFormData"
           />
-          <v-btn elevation="0" @click="upload">Anexar</v-btn>
+          <v-btn
+            class="ma-2 white--text"
+            color="blue-grey"
+            depressed
+            dark
+            :loading="loadingFile"
+            @click="upload"
+          >
+            <span>Enviar</span>
+            <v-icon right small>mdi-cloud-upload</v-icon>
+          </v-btn>
         </label>
       </div>
     </div>
@@ -52,7 +62,8 @@ export default {
     return {
       attachments: [],
       form: new FormData(),
-      file: {}
+      file: {},
+      loadingFile: false
     };
   },
   mounted() {
@@ -67,11 +78,18 @@ export default {
       this.form.append("file", this.$refs.myFiles.files[0]);
     },
     async upload() {
-      await AttachmentService.upload(this.card._id, this.form);
-      this.findByCard();
-      const input = this.$refs.myFiles;
-      input.type = "text";
-      input.type = "file";
+      this.loadingFile = true;
+      try {
+        await AttachmentService.upload(this.card._id, this.form);
+      } catch (err) {
+        this.$notification.showError(err);
+      } finally {
+        this.loadingFile = false;
+        this.findByCard();
+        const input = this.$refs.myFiles;
+        input.type = "text";
+        input.type = "file";
+      }
     },
     async remove(attachment) {
       await AttachmentService.delete(attachment);

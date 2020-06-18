@@ -1,7 +1,7 @@
 import LayoutBase from '../../layouts/App.vue';
 
 const routes = {
-  path: '/app',
+  path: '/',
   redirect: { name: 'app.home' },
   component: LayoutBase,
   children: [

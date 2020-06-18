@@ -1,16 +1,56 @@
 <template>
   <div class="dashboard">
-    <div
-      class="boards"
-      v-for="board in boards"
-      :key="board._id"
-      @click="enter(board)"
-    >
-      <div>
-        <p class="text-md font-bold text-gray-900">{{ board.title }}</p>
-      </div>
-    </div>
-    <!-- <v-btn @click="createBoard">Add Board</v-btn> -->
+    <v-container class="grey lighten-5">
+      <v-row class="mb-6">
+        <v-col v-for="board in boards" :key="board._id" :md="3" :sm="6">
+          <v-card class="pa-6 board" @click="enter(board)">{{
+            board.title
+          }}</v-card>
+        </v-col>
+        <v-col :md="3" :sm="6">
+          <v-card
+            class="pa-6 board"
+            @click="showCreateBoard = !showCreateBoard"
+          >
+            <span class="black--text">
+              <v-icon color="black" dense>mdi-plus</v-icon>
+              Criar novo quadro</span
+            >
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <v-dialog v-model="showCreateBoard" width="500">
+      <v-card elevation="0">
+        <v-card-title></v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model="board.title"
+            label="Título do quadro"
+            outlined
+            dense
+            autofocus
+          ></v-text-field>
+          <div class="d-flex">
+            <v-btn
+              class="mr-1"
+              color="success"
+              elevation="0"
+              @click="createBoard"
+              >Criar quadro</v-btn
+            >
+            <v-btn
+              class="ml-1"
+              text
+              elevation="0"
+              @click="showCreateBoard = !showCreateBoard"
+              >Cancelar</v-btn
+            >
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -20,38 +60,47 @@ export default {
   data() {
     return {
       // boards: [],
+      showCreateBoard: false,
+      board: {}
     };
   },
   computed: {
     boards: {
       get() {
-        return this.$store.getters['app/getBoards'];
+        return this.$store.getters["app/getBoards"];
       },
-      set() {},
+      set() {}
     },
     user: {
       get() {
-        return this.$store.getters['user/getUser'];
-      },
-    },
+        return this.$store.getters["user/getUser"];
+      }
+    }
   },
   async mounted() {
     await this.loadBoards();
   },
   methods: {
-    createBoard() {
-      const board = {
-        title: "Siscont",
-      };
-      this.$store.dispatch("createBoard", board);
+    async createBoard() {
+      try {
+        await this.$store.dispatch("app/createBoard", {
+          board: this.board,
+          user_id: this.user._id
+        });
+        this.showCreateBoard = !this.showCreateBoard;
+      } catch (err) {
+        if (err.response && err.response.data) {
+          this.$notification.showError(err.response.data);
+        } else this.$notification.showError(err);
+      }
     },
     async loadBoards() {
       this.$store.dispatch("app/loadBoards", this.user._id);
     },
     enter(board) {
       this.$router.push({ name: "app.board", query: { id: board._id } });
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -59,33 +108,12 @@ export default {
 .dashboard {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-around;
 }
-.boards {
-/* col-4 p-5 m-2 bg-white rounded-md shadow */
-  columns: 3;
-  padding: 20px;
-  margin: 8px;
+.board {
+  /* col-4 p-5 m-2 bg-white rounded-md shadow */
   background: #fff;
   border-radius: 0.375rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
-/* .boards {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  justify-items: center;
-}
-.card {
-  flex: 0 0 280px;
-  height: 150px;
-  margin: 5px;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px 0 rgba(192, 208, 230, 0.8);
-  cursor: pointer;
-}
-.card .card-body {
-  margin: 20px 0 0 20px;
-  font-size: 18px;
-  font-weight: bold;
-} */
 </style>

@@ -1,119 +1,134 @@
 <template>
-  <v-card class="details">
-    <v-card-title>
-      <div class="details-title">
-        <div>
-          <span>{{ card.title }}</span>
-        </div>
-        <div>
-          <v-btn class="close" icon @click="close">X</v-btn>
-        </div>
-      </div>
-    </v-card-title>
-    <v-card-subtitle>
-      <span>Criado por: {{ user.name }}</span>
-    </v-card-subtitle>
-    <v-card-text class="details details-body">
-      <div class="details-main">
-        <Labels :card="card"></Labels>
-        <div class="description">
-          <div class="d-flex">
-            <svg
-              class="mr-2"
-              style="width:24px;height:24px"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M4,5H20V7H4V5M4,9H20V11H4V9M4,13H20V15H4V13M4,17H14V19H4V17Z"
-              />
-            </svg>
-            <h2 class="section-title">Descrição</h2>
-          </div>
-          <v-textarea
-            v-model="card.description"
-            label="Adicione uma descrição detalhada"
-            solo
-            hide-details
-          ></v-textarea>
-          <v-btn
-            :disabled="enableSaveDescription"
-            class="description-button"
-            color="success"
-            elevation="0"
-            small
-            @click="save"
-            >Salvar</v-btn
-          >
-        </div>
-      </div>
-    </v-card-text>
-    <v-divider></v-divider>
-    <div class="tabs">
-      <v-tabs grow>
-        <v-tab>
-          <v-icon class="mx-2" small>mdi-paperclip</v-icon>
-          Anexos
-        </v-tab>
-        <v-tab>
-          <v-icon class="mx-2" small>mdi-comment-outline</v-icon>
-          Comentários
-        </v-tab>
-
-        <v-tab-item>
-          <div class="attachments">
-            <Attachments :card="card"></Attachments>
-          </div>
-        </v-tab-item>
-        <v-tab-item>
+  <v-flex >
+    <v-card color="primary lighten-1 white--text" class="details">
+      <v-card-title>
+        <div class="details-title">
           <div>
-            <div class="d-flex align-center">
-              <v-textarea
-                v-model="comment.text"
-                class="comment-input"
-                solo
-                dense
-                label="Escrever um comentário..."
-                hide-details
-                auto-grow
-                row-height="24"
-                rows="1"
-                @keyup.ctrl.enter.exact="createComment"
-              ></v-textarea>
-              <v-btn icon @click="createComment">
-                <v-icon>mdi-send</v-icon>
-              </v-btn>
-            </div>
-
-            <ul v-if="showComments" class="comments">
-              <template v-for="(comment, index) in comments">
-                <li class="comment" :key="comment._id">
-                  <div class="d-flex justify-space-between">
-                    <div>
-                      <span class="comment-user">{{ comment.user.name }}</span>
-                      <timeago
-                        class="comment-time"
-                        :datetime="comment.createdAt"
-                      ></timeago>
-                    </div>
-                    <div class="comment-actions">
-                      <a href="#">Edit</a>
-                      <a href="#">Delete</a>
-                    </div>
-                  </div>
-                  <span class="comment-text">{{ comment.text }}</span>
-                </li>
-                <v-divider
-                  v-if="index + 1 < comments.length"
-                  :key="index"
-                ></v-divider>
-              </template>
-            </ul>
+            <span class="headline">{{ card.title }}</span>
           </div>
-        </v-tab-item>
-      </v-tabs>
-    </div>
-  </v-card>
+          <div>
+            <v-btn class="close" icon @click="close">X</v-btn>
+          </div>
+        </div>
+      </v-card-title>
+      <v-card-subtitle class="white--text">
+        <span>Criado por: {{ user.name }}</span>
+      </v-card-subtitle>
+    </v-card>
+    <v-card>
+      <v-card-text class="details details-body">
+        <div class="details-main">
+          <Labels class="mb-2" :card="card" :label="label"></Labels>
+          <div class="description">
+            <div class="d-flex">
+              <svg
+                class="mr-2"
+                style="width:24px;height:24px"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M4,5H20V7H4V5M4,9H20V11H4V9M4,13H20V15H4V13M4,17H14V19H4V17Z"
+                />
+              </svg>
+              <h2 class="section-title">Descrição</h2>
+            </div>
+            <v-textarea
+              v-model="description"
+              label="Adicione uma descrição detalhada"
+              solo
+              hide-details
+
+            ></v-textarea>
+            <v-btn
+              :disabled="enableSaveDescription"
+              class="description-button"
+              color="success"
+              elevation="0"
+              small
+              @click="save"
+              >Salvar</v-btn
+            >
+          </div>
+        </div>
+      </v-card-text>
+      <v-divider></v-divider>
+      <div class="tabs">
+        <v-tabs grow>
+          <v-tab>
+            <v-icon class="mx-2" small>mdi-paperclip</v-icon>
+            Anexos
+          </v-tab>
+          <v-tab>
+            <v-icon class="mx-2" small>mdi-comment-outline</v-icon>
+            Comentários
+          </v-tab>
+
+          <v-tab-item>
+            <div class="attachments">
+              <Attachments :card="card"></Attachments>
+            </div>
+          </v-tab-item>
+          <v-tab-item>
+            <div>
+              <div class="d-flex align-center">
+                <v-textarea
+                  v-model="comment.text"
+                  class="comment-input"
+                  solo
+                  dense
+                  label="Escrever um comentário..."
+                  hide-details
+                  auto-grow
+                  row-height="24"
+                  rows="1"
+                  @keyup.ctrl.enter.exact="createComment"
+                ></v-textarea>
+                <v-btn
+                  class="ma-2 white--text"
+                  color="blue-grey"
+                  depressed
+                  dark
+                  @click="createComment"
+                >
+                  <span>Enviar</span>
+                  <v-icon right small>mdi-send</v-icon>
+                </v-btn>
+              </div>
+
+              <ul v-if="showComments" class="comments">
+                <template v-for="(comment, index) in comments">
+                  <li class="comment" :key="comment._id">
+                    <div class="d-flex justify-space-between">
+                      <div>
+                        <span class="comment-user">{{
+                          comment.user.name
+                        }}</span>
+                        <timeago
+                          class="comment-time"
+                          :datetime="comment.createdAt"
+                        ></timeago>
+                      </div>
+                      <div class="comment-actions">
+                        <v-btn color="error" x-small icon>
+                          <v-icon>mdi-delete</v-icon>
+                        </v-btn>
+                      </div>
+                    </div>
+                    <span class="comment-text">{{ comment.text }}</span>
+                  </li>
+                  <v-divider
+                    v-if="index + 1 < comments.length"
+                    :key="index"
+                  ></v-divider>
+                </template>
+              </ul>
+            </div>
+          </v-tab-item>
+        </v-tabs>
+      </div>
+    </v-card>
+  </v-flex>
 </template>
 
 <script>
@@ -133,16 +148,34 @@ export default {
       comment: {},
       showActivities: false,
       showComments: true,
-      tab: null
+      tab: null,
+      description: ""
     };
   },
   mounted() {
     this.loadComments();
+    this.loadDescription();
   },
   computed: {
     user: {
       get() {
         return this.$store.state.user.user;
+      }
+    },
+    cardSelected: {
+      get() {
+        return this.$store.state.app.cardSelected;
+      }
+    },
+    label: {
+      get() {
+        let labelTemp = {};
+        this.$store.state.app.lists.map(list => {
+          list.cards.map(c => {
+            if (c._id === this.card._id) labelTemp = c.label;
+          });
+        });
+        return labelTemp;
       }
     },
     enableSaveDescription() {
@@ -158,10 +191,15 @@ export default {
   },
   methods: {
     async save() {
-      await CardService.update(this.card);
+      await CardService.updateDescription(this.card._id, this.description);
       this.$notification.showSuccess("Atualizado com sucesso!");
     },
+    async loadDescription() {
+      let { data } = await CardService.loadDescription(this.card._id);
+      this.description = data.description;
+    },
     async loadComments() {
+      console.log(this.card);
       const { data } = await CommentService.findByCard(this.card._id);
       this.comments = data;
     },

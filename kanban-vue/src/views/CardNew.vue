@@ -13,12 +13,22 @@
       {{ card.title }}
     </p>
     <div class="member">
-      <span>
-        <img
-          src="https://api.adorable.io/avatars/196/abott@adorable.png"
-          alt=""
-        />
-      </span>
+      <Avatar :user="card.owner"></Avatar>
+      <v-menu offset-y>
+        <template v-slot:activator="{ on }">
+            <v-btn v-on="on" elevation="0" icon small>
+              <v-icon>mdi-dots-horizontal</v-icon>
+            </v-btn>
+          </template>
+          <v-card>
+            <v-list dense>
+              <v-list-item @click="remove">
+                <v-icon>mdi-delete</v-icon>
+                Delete
+              </v-list-item>
+            </v-list>
+          </v-card>
+      </v-menu>
     </div>
     <div class="card-footer">
       <div class="footer-date">
@@ -30,7 +40,7 @@
           style="width:24px;height:24px"
           viewBox="0 0 24 24"
         >
-          <path
+          <pgath
             fill="currentColor"
             d="M4,5H20V7H4V5M4,9H20V11H4V9M4,13H20V15H4V13M4,17H14V19H4V17Z"
           />
@@ -57,9 +67,11 @@
 import moment from "moment";
 import CardService from "../services/card.service";
 import CardDetail from "../views/CardDetail";
+import Avatar from "../components/Avatar";
 export default {
   components: {
-    CardDetail
+    CardDetail,
+    Avatar
   },
   props: {
     card: {}
@@ -76,13 +88,16 @@ export default {
       const { data } = await CardService.findCard(this.card._id);
       this.detail = data;
       this.showDetails = true;
+      this.$store.dispatch("app/setCardSelected", data);
     },
     async remove() {
       await CardService.delete(this.card);
-      // this.$store.commit("removeCardFromList", this.card);
+      this.$store.commit("app/removeCardFromList", this.card);
     },
     parseData(date) {
-      return moment(date).locale('pt-BR').format('l');
+      return moment(date)
+        .locale("pt-BR")
+        .format("l");
     }
   }
 };
@@ -107,6 +122,8 @@ export default {
 }
 .card .member {
   /* mb-2 pt-0 */
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 8px;
   padding-top: 0;
 }

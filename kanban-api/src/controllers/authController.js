@@ -27,14 +27,13 @@ module.exports = {
   },
   async authencicate(request, response) {
     const { email, password } = request.body;
-    console.log(email, password);
 
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) return response.status(400).send({ error: "User not found" });
 
     if (!await bcrypt.compare(password, user.password)) {
-      return response.status(400).send({ error: 'Invalid password' });
+      return response.status(400).send({ error: 'Incorrect email address and / or password.' });
     }
     user.password = undefined;
 

@@ -1,30 +1,26 @@
 <template>
-  <div class="">
-    <v-app-bar height="64" color="primary" dark elevation="2" app>
-      <div class="header">
-        <h1>Dashboard</h1>
-        <div>
-          <v-btn icon @click="logout">
-            <v-icon>mdi-logout</v-icon>
-          </v-btn>
-        </div>
-      </div>
-    </v-app-bar>
+  <div>
+    <Header />
     <v-content class="workboard">
-      <router-view></router-view>
+      <v-container>
+        <transition name="slide" mode="out-in">
+          <router-view></router-view>
+        </transition>
+      </v-container>
     </v-content>
     <v-footer app></v-footer>
+    <loading></loading>
   </div>
 </template>
 
 <script>
+import Header from "../components/Header";
+import Loading from "../components/Loading";
 export default {
-  methods: {
-    logout() {
-      this.$store.dispatch('auth/logout');
-      this.$router.push('/');
-    },
-  },
+  components: {
+    Header,
+    Loading
+  }
 };
 </script>
 
@@ -32,9 +28,32 @@ export default {
 .workboard {
   height: 100vh;
 }
-.header {
-  display: flex;
-  flex: 1;
-  justify-content: space-between;
+@keyframes slide-in {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+@keyframes slide-out {
+  from {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+}
+
+.slide-enter-actice {
+  animation: slide-in .3s ease;
+}
+
+.slide-leave-active {
+  animation: slide-out .3s ease;
 }
 </style>

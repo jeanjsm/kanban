@@ -8,6 +8,7 @@ import routeApp from './routes/app';
 Vue.use(VueRouter)
 
 const router = new VueRouter({
+  mode: 'history',
   routes: [ routeAuth, routeApp ]
 });
 

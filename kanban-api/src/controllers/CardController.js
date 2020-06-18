@@ -50,15 +50,18 @@ module.exports = {
     if (!user) {
       return response.status(400).json({ error: "User does not exists" });
     }
-
     const list = await List.findById(list_id);
 
     if (!list) {
       return response.status(400).json({ error: "List does not exists" });
     }
 
-    const card = await Card.create({ title, list: list_id, owner: user_id });
-    return response.json(card);
+    Card.create({ title, list, owner: user_id }, function(err, card) {
+      if (err) {
+        return response.status(400).json({ error: err });
+      }
+      return response.json(card);
+    });
   },
 
   async update(request, response) {

@@ -10,7 +10,6 @@ module.exports = {
 
     if (!card) 
       return response.status(400).json({ error: 'Card does not exists' });
-    console.log(card);
 
     const attachments = await Attachment.find({ card: card_id });
 

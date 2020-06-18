@@ -7,12 +7,12 @@
     <div class="d-flex">
       <div class="labels">
         <v-chip
-          :color="card.label.color"
-          :dark="card.label.color !== '#FFFFFF'"
-          :outlined="card.label.color === '#FFFFFF'"
+          :color="label.color"
+          :dark="label.color !== '#FFFFFF'"
+          :outlined="label.color === '#FFFFFF'"
           small
-          v-if="card.label"
-          >{{ card.label.name }}</v-chip
+          v-if="label"
+          >{{ label.name }}</v-chip
         >
         <v-menu
           v-model="showMenuLabels"
@@ -89,7 +89,8 @@ import _ from "lodash";
 import LabelService from "../services/label.service";
 export default {
   props: {
-    card: {}
+    card: {},
+    label: {}
   },
   data() {
     return {
@@ -134,7 +135,7 @@ export default {
     async updateCard(label) {
       let cardUpdate = _.clone(this.card);
       cardUpdate.label = label;
-      this.$store.dispatch("app/updateCard", cardUpdate);
+      this.$store.dispatch("app/updateLabel", cardUpdate);
     }
   }
 };

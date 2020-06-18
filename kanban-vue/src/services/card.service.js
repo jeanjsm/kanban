@@ -24,4 +24,16 @@ export default class CardService {
   static update(card) {
     return api.put('/cards', card);
   }
+
+  static updateDescription(card_id, description) {
+    return api.patch('/cards/description', { card_id, description });
+  }
+
+  static updateLabel(card_id, label_id) {
+    return api.patch('/cards/label', { card_id, label_id });
+  }
+
+  static loadDescription(card_id) {
+    return api.get(`/cards/${card_id}/description`);
+  }
 }

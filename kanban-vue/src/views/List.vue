@@ -15,27 +15,30 @@
           @click="enableAddCard = !enableAddCard"
           >Add Card</v-btn
         >
-        <div class="add-card" v-if="enableAddCard">
-          <v-text-field
-            v-model="newCardTitle"
-            label="Add a card"
-            outlined
-            hide-details
-            dense
-            v-on:keyup.enter="createCard"
-          />
-          <div>
-            <v-btn color="success" small class="ma-1" @click="createCard"
-              >Add</v-btn
-            >
-            <v-btn
-              color="error"
-              small
-              class="ma-1"
+        <div id="addCard">
+          <div class="add-card" v-if="enableAddCard">
+            <v-text-field
+              v-model="newCardTitle"
+              label="Add a card"
               outlined
-              @click="enableAddCard = !enableAddCard"
-              >Cancel</v-btn
-            >
+              hide-details
+              autofocus
+              dense
+              v-on:keyup.enter="createCard"
+            />
+            <div>
+              <v-btn color="success" small class="ma-1" @click="createCard"
+                >Add</v-btn
+              >
+              <v-btn
+                color="error"
+                small
+                class="ma-1"
+                outlined
+                @click="enableAddCard = !enableAddCard"
+                >Cancel</v-btn
+              >
+            </div>
           </div>
         </div>
       </ul>
@@ -53,36 +56,36 @@ import CardService from "../services/card.service";
 export default {
   components: {
     VueDraggable,
-    CardNew,
+    CardNew
     // InputEdit,
   },
   props: {
-    list: {},
+    list: {}
   },
   data() {
     return {
       cardsTemp: [],
       enableAddCard: false,
       newCardTitle: "",
-      enableChangeTitle: true,
+      enableChangeTitle: true
     };
   },
   computed: {
     user: {
       get() {
         return this.$store.state.user.user;
-      },
+      }
     },
     lists: {
       get() {
-        return this.$store.getters['app/getLists'];
+        return this.$store.getters["app/getLists"];
       }
     },
     cards: {
       get() {
         let cardList = [];
         const list_id = this.list._id;
-        this.$store.state.app.lists.map((list) => {
+        this.$store.state.app.lists.map(list => {
           if (list._id === list_id) {
             cardList = list.cards;
           }
@@ -90,34 +93,50 @@ export default {
         return cardList;
       },
       set(value) {
-        this.$store.dispatch('app/updateCardList', {list_id: this.list._id, cards: value});
+        this.$store.dispatch("app/updateCardList", {
+          list_id: this.list._id,
+          cards: value
+        });
       }
-    },
+    }
+  },
+  watch: {
+    enableAddCard(value) {
+      if (value === true) {
+        const container = this.$el.querySelector("#addCard");
+        this.scrollToView(container);
+      }
+    }
   },
   methods: {
+    scrollToView(container) {
+      setTimeout(function() {
+        container.scrollIntoView();
+      }, 10);
+    },
     async createCard() {
       if (this.newCardTitle.trim() === "") return;
       try {
         const user_id = this.user._id;
         const card = {
           list_id: this.list._id,
-          title: this.newCardTitle,
+          title: this.newCardTitle
         };
-        const { data } = await CardService.createCard(card, user_id);
-        this.$store.dispatch('app/addCardToList', {list_id: this.list._id, data})
+        await CardService.createCard(card, user_id);
+        this.$store.dispatch("app/loadCards", this.list._id);
         this.newCardTitle = "";
         this.enableAddCard = false;
       } catch (error) {
-        console.log(error);
+        console.log(error.response);
       }
     },
     clickOutside() {
       this.enableChangeTitle = false;
-    },
+    }
   },
   directives: {
-    ClickOutside,
-  },
+    ClickOutside
+  }
 };
 </script>
 
@@ -129,7 +148,7 @@ export default {
   display: flex;
   flex-direction: column;
   width: 400px;
-  background-color: #eef0f1;
+  /* background-color: #eef0f1; */
   border-radius: 0.375rem;
 }
 .list h2 {
@@ -151,7 +170,6 @@ export default {
 .list .button-add-card {
   width: 250px;
   bottom: 0;
-  /* position: absolute; */
 }
 .list .add-card {
   display: block;
@@ -161,48 +179,4 @@ export default {
   border-radius: 0.375rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
-/* .list {
-  display: flex;
-  flex-direction: column;
-  padding: 0 15px;
-  flex: 0 0 320px;
-  background-color: #ebecf0;
-  margin: 10px;
-  border-radius: 8px;
-  overflow-y: scroll;
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 42px;
-}
-h2 {
-  font-weight: 500;
-  font-size: 16px;
-  padding: 0 10px;
-}
-
-ul {
-  margin-top: 30px;
-  overflow-y: scroll;
-  padding: 0 !important;
-}
-.add {
-  flex: 1;
-}
-.add-card {
-  display: flex;
-  flex-direction: column;
-}
-.add-card-buttons {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 5px;
-}
-.add-card-buttons span {
-  font-size: 20px;
-  font-weight: bold;
-} */
 </style>

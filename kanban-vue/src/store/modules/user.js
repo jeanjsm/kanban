@@ -1,17 +1,25 @@
 function state() {
   return {
-    user: {},
-    token: "",
+    user: JSON.parse(localStorage.getItem("user")) || {},
+    token: JSON.parse(localStorage.getItem("token")) || ""
   };
 }
 
 const mutations = {
   setUser(state, user) {
     state.user = user;
+    localStorage.setItem("user", JSON.stringify(user));
   },
   setToken(state, token) {
     state.token = token;
+    localStorage.setItem("token", JSON.stringify(token));
   },
+  clear(state) {
+    state.user = {};
+    state.token = "";
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+  }
 };
 
 const actions = {
@@ -20,13 +28,13 @@ const actions = {
   },
   setToken({ commit }, token) {
     commit("setToken", token);
-  },
+  }
 };
 
 const getters = {
-  getUser: (state) => {
+  getUser: state => {
     return state.user;
-  },
+  }
 };
 
 export default {
@@ -34,5 +42,5 @@ export default {
   state,
   mutations,
   actions,
-  getters,
+  getters
 };

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img v-if="user !== undefined && user.avatar" :src="user.avatar" alt="">
+    <img v-if="user !== undefined && user.avatar" :src="user.avatar" alt="" />
     <span>{{ initials }}</span>
   </div>
 </template>
@@ -13,19 +13,22 @@ export default {
   computed: {
     initials() {
       if (this.user !== undefined) {
-        const words = this.user.name.split(/[\s-]+/);
-        let initialsName = "";
-        for(let word in words) {
-          if (initialsName.length < 2) {
-            initialsName += words[word].substr(0, 1);
+        if (this.user.name) {
+          const words = this.user.name.split(/[\s-]+/);
+          let initialsName = "";
+          for (let word in words) {
+            if (initialsName.length < 2) {
+              initialsName += words[word].substr(0, 1);
+            }
           }
+          return initialsName.toUpperCase();
         }
-        return initialsName.toUpperCase()
+        return "";
       }
       return "++";
     }
   }
-}
+};
 </script>
 
 <style scoped>

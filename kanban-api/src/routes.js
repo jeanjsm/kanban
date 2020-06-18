@@ -9,16 +9,20 @@ const CardController = require('./controllers/CardController');
 const CommentController = require('./controllers/CommentController');
 const AttachmentController = require('./controllers/AttachmentController');
 const LabelController = require('./controllers/LabelController');
+const UserController = require('./controllers/UserController');
 
 const routes = Router();
-// routes.use(authMiddleware);
+routes.use(authMiddleware);
 
 routes.get('/pendencias', PendenciaController.index);
 routes.post('/pendencias', PendenciaController.store);
 
+routes.get('/users', UserController.findUserByNameOrEmail);
+
 routes.get('/boards', BoardController.index);
 routes.get(`/boards/:board_id`, BoardController.findById);
 routes.post('/boards', BoardController.store);
+routes.put('/boards/addMember', BoardController.addMember);
 
 routes.get('/lists', ListController.index);
 routes.post('/lists', ListController.store);
@@ -35,7 +39,7 @@ routes.post('/labels', LabelController.store);
 
 routes.get('/cards/:card_id/comments', CommentController.index);
 routes.post('/cards/:card_id/comments', CommentController.store);
-routes.delete('/cards/:card_id/comments/:comment_id', CommentController.delete);
+routes.delete('/cards/comments/:comment_id', CommentController.delete);
 routes.put('/cards/:card_id/comments', CommentController.update);
 
 routes.get('/cards/:card_id/files', AttachmentController.index);

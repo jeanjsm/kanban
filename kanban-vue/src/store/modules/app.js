@@ -1,16 +1,24 @@
 import BoardService from "@/services/board.service";
 import ListService from "@/services/list.service";
 import CardService from "../../services/card.service";
-import _ from 'lodash';
+import _ from "lodash";
 
 function state() {
   return {
+    isLoading: false,
+    loadingMessage: '',
     boards: [],
     lists: [],
-    test: []
+    cardSelected: {}
   };
 }
 const mutations = {
+  setLoading(state, loading) {
+    state.isLoading = loading;
+  },
+  setLoadingMessage(state, message) {
+    state.loadingMessage = message;
+  },
   addTest(state, payload) {
     state.test.push(payload);
   },
@@ -35,7 +43,7 @@ const mutations = {
       if (list._id === list_id) {
         list.cards = cards;
       }
-    })
+    });
   },
   updateList(state, payload) {
     state.lists.map(list => {
@@ -72,9 +80,12 @@ const mutations = {
           if (card._id === cardChanged._id) {
             card = _.cloneDeep(cardChanged);
           }
-        })
+        });
       }
-    })
+    });
+  },
+  setCardSelected(state, cardSelected) {
+    state.cardSelected = cardSelected;
   }
 };
 const actions = {
@@ -82,8 +93,10 @@ const actions = {
     const { data } = await BoardService.loadBoards(user_id);
     commit("addBoards", data);
   },
-  async createBoard(context, board) {
-    const { data } = await BoardService.createBoard(this.state.user._id, board);
+  async createBoard(context, { board, user_id }) {
+    if (board.title === undefined || board.title === "")
+      throw "Título não informado!";
+    const { data } = await BoardService.createBoard(user_id, board);
     context.commit("addBoard", data);
   },
   async loadBoard({ commit, dispatch }, boardId) {
@@ -107,18 +120,24 @@ const actions = {
 
   async updateCardList({ commit }, { list_id, cards }) {
     let newCards = [];
-    cards.map(async card =>{
+    cards.map(async card => {
       let cardChanged = _.cloneDeep(card);
       cardChanged.list = list_id;
       cardChanged = await CardService.update(cardChanged);
       newCards.push(cardChanged);
     });
-    commit('replaceCardsList', { list_id, cards })
+    commit("replaceCardsList", { list_id, cards });
+  },
+
+  async updateLabel({ commit, dispatch }, card) {
+    const { data } = await CardService.updateLabel(card._id, card.label._id)
+    commit("updateCard", data);
+    dispatch("loadCards", data.list_id);
   },
 
   async updateCard({ commit, dispatch }, card) {
     const { data } = await CardService.update(card);
-    commit('updateCard', data);
+    commit("updateCard", data);
     dispatch("loadCards", data.list);
   },
 
@@ -131,8 +150,12 @@ const actions = {
   addCardToList({ commit }, payload) {
     commit("addCardToList", payload);
   },
-  removeCardFromList({ commit }, payload) {
-    commit("removeCardFromList", payload);
+  async removeCardFromList({ dispatch }, payload) {
+    await CardService.delete(payload);
+    dispatch("loadCards", payload.list);
+  },
+  setCardSelected({ commit }, payload) {
+    commit("setCardSelected", payload);
   }
 };
 const getters = {

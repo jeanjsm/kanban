@@ -5,6 +5,11 @@ const notification = {
     Vue.toasted.success(message, {
       icon: "mdi-check-circle"
     });
+  },
+  showError(message) {
+    Vue.toasted.error(message, {
+      icon: "mdi-alert-circle"
+    });
   }
 };
 

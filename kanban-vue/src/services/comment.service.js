@@ -11,4 +11,7 @@ export default class CommentService {
       }
     });
   }
+  static delete(comment) {
+    return api.delete('/cards/comments/' + comment._id);
+  }
 }
