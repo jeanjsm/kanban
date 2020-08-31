@@ -40,6 +40,7 @@ span {
   margin: 4px;
   padding: 4px;
   border-radius: 50%;
+  min-width: 24px;
   color: #ffffff;
 }
 </style>

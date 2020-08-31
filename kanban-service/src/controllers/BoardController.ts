@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import knex from "../database/connection";
 import Board from "../models/Board";
-import { request } from "http";
 
 class BoardController {
   async index(request: Request, response: Response) {
@@ -60,7 +59,11 @@ class BoardController {
 
     if (!board) return response.status(400).send({ error: "Board not found" });
 
-    const users = await knex.select('user._id', 'user.name', 'user.email', 'user_board.owner').from('user').join('user_board', 'user._id', '=', 'user_board.user_id').where('user_board.board_id', board_id);
+    const users = await knex
+        .select("user._id", "user.name", "user.email", "user_board.owner")
+        .from("user")
+        .join("user_board", "user._id", "=", "user_board.user_id")
+        .where("user_board.board_id", board_id);
     return response.json(users);
   }
 
@@ -82,13 +85,12 @@ class BoardController {
 
     await knex("user_board").insert({
       user_id: id_member,
-      board_id: id,
+      board_id: board_id,
       owner: false,
     });
 
-    return response.json({ message: 'Successfully added' })
+    return response.json({ message: "Successfully added" });
   }
 }
-
 
 export default BoardController;

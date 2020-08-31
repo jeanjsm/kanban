@@ -1,6 +1,37 @@
 <template>
   <div class="list">
-    <h2>{{ list.title }}</h2>
+    <div class="list-header">
+      <h2>{{ list.title }}</h2>
+      <v-menu offset-y>
+        <template v-slot:activator="{ on }">
+          <v-btn v-on="on" elevation="0" icon small>
+            <v-icon>mdi-dots-horizontal</v-icon>
+          </v-btn>
+        </template>
+        <v-card elevation="0">
+          <v-list dense>
+            <v-list-item @click="enableAddCard = !enableAddcard">
+              <v-list-item-avatar>
+                <v-icon>mdi-plus</v-icon>
+              </v-list-item-avatar>
+              Adicionar cartão
+            </v-list-item>
+            <v-list-item  @click="enableChangeTitle = !enableChangeTitle">
+              <v-list-item-avatar>
+                <v-icon>mdi-pencil</v-icon>
+              </v-list-item-avatar>
+              Alterar Título da Coluna
+            </v-list-item>
+            <v-list-item @click="removeList">
+              <v-list-item-avatar>
+                <v-icon>mdi-delete</v-icon>
+              </v-list-item-avatar>
+              Remover coluna
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-menu>
+    </div>
     <div class="items">
       <ul>
         <VueDraggable group="board" v-model="cards">
@@ -13,13 +44,13 @@
           block
           color="primary"
           @click="enableAddCard = !enableAddCard"
-          >Add Card</v-btn
+          >Adicionar Cartão</v-btn
         >
         <div id="addCard">
           <div class="add-card" v-if="enableAddCard">
             <v-text-field
               v-model="newCardTitle"
-              label="Add a card"
+              label="Insira um título"
               outlined
               hide-details
               autofocus
@@ -43,6 +74,23 @@
         </div>
       </ul>
     </div>
+    <v-dialog width="450" v-model="enableChangeTitle">
+      <v-card>
+        <v-card-title>Alterar Título da Coluna</v-card-title>
+        <v-card-text>
+          <v-text-field
+            outlined
+            dense
+            hide-details
+            label="Título da coluna"
+            v-model="list.title"
+          ></v-text-field>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="success" large @click="updateListTitle">Salvar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -53,6 +101,7 @@ import CardNew from "./CardNew";
 import ClickOutside from "vue-click-outside";
 // import InputEdit from "../components/InputEdit";
 import CardService from "../services/card.service";
+import ListService from '../services/list.service';
 export default {
   components: {
     VueDraggable,
@@ -67,7 +116,7 @@ export default {
       cardsTemp: [],
       enableAddCard: false,
       newCardTitle: "",
-      enableChangeTitle: true
+      enableChangeTitle: false,
     };
   },
   computed: {
@@ -130,6 +179,13 @@ export default {
         console.log(error.response);
       }
     },
+    async updateListTitle() {
+      await ListService.updateListTitle(this.list._id, this.list.title, this.user._id);
+      this.enableChangeTitle = false;
+    },
+    removeList() {
+      console.log('removing')
+    },
     clickOutside() {
       this.enableChangeTitle = false;
     }
@@ -158,6 +214,12 @@ export default {
   font-size: 20px;
   font-weight: 600;
   color: rgba(74, 85, 104, 1) "";
+}
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 4px;
 }
 .list .items {
   flex: 1 1 0%;

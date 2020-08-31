@@ -41,4 +41,12 @@ export default class AttachmentController {
     const attachment = await knex.select('*').from('attachment').where('id', attachmentId[0]).first();
     return response.send(attachment);
   }
+
+  async delete(request: Request, response: Response) {
+    const { id } = request.params;
+
+    await knex('attachment').where('_id', id).del();
+
+    return response.send();
+  }
 }

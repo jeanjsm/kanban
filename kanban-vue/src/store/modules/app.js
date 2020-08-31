@@ -9,10 +9,14 @@ function state() {
     loadingMessage: '',
     boards: [],
     lists: [],
-    cardSelected: {}
+    cardSelected: {},
+    confirmDialog: false
   };
 }
 const mutations = {
+  setConfirmDialog(state) {
+    state.confirmDialog = !state.confirmDialog;
+  },
   setLoading(state, loading) {
     state.isLoading = loading;
   },

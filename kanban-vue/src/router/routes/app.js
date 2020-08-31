@@ -6,7 +6,7 @@ const routes = {
   component: LayoutBase,
   children: [
     {
-      path: 'home',
+      path: '/',
       name: 'app.home',
       component: () => import('../../views/Dashboard.vue'),
       meta: { sessionRequired: true }
@@ -15,6 +15,12 @@ const routes = {
       path: 'board',
       name: 'app.board',
       component: () => import('../../views/Board.vue'),
+      meta: { sessionRequired: true }
+    },
+    {
+      path: 'profile/',
+      name: 'app.profile',
+      component: () => import('../../views/Profile.vue'),
       meta: { sessionRequired: true }
     }
   ]

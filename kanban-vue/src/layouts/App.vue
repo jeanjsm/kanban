@@ -1,13 +1,13 @@
 <template>
   <div>
     <Header />
-    <v-content class="workboard">
-      <v-container>
+    <v-main class="workboard">
+      <v-container fluid class="pa-0">
         <transition name="slide" mode="out-in">
           <router-view></router-view>
         </transition>
       </v-container>
-    </v-content>
+    </v-main>
     <v-footer app></v-footer>
     <loading></loading>
   </div>
@@ -20,7 +20,7 @@ export default {
   components: {
     Header,
     Loading
-  }
+  },
 };
 </script>
 

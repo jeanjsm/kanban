@@ -17,7 +17,7 @@ class AuthController {
 
       const insertedId = await knex("user").returning("_id").insert({
         name,
-        email
+        email,
       });
 
       const userId = insertedId[0];
@@ -25,7 +25,9 @@ class AuthController {
       const hash = await bcrypt.hash(userId + password, 10);
       const passwordEncrypted = hash;
 
-      await knex('user').update({ password: passwordEncrypted }).where('_id', userId);
+      await knex("user")
+        .update({ password: passwordEncrypted })
+        .where("_id", userId);
 
       const user: User = await knex("user").where("_id", userId).first();
 
@@ -53,26 +55,64 @@ class AuthController {
       return response
         .status(400)
         .send({ error: "Incorrect email address and / or password." });
-    
-    if (!await bcrypt.compare(user._id + password, user.password)) {
-      return response.status(400).send({ error: 'Incorrect email address and / or password.' });
+
+    if (!(await bcrypt.compare(user._id + password, user.password))) {
+      return response
+        .status(400)
+        .send({ error: "Incorrect email address and / or password." });
     }
     user.password = undefined;
+    user.createdAt = undefined;
 
-    return response.send({ user, token: auth.generateToken({ id: user._id }) });
+    console.log(user);
+
+    return response.send({ user, token: auth.generateToken({ user: user }) });
   }
 
-  async findUser(request: Request, response: Response) {
-    const { param } = request.query;
+  async findUserForBoard(request: Request, response: Response) {
+    const { param, board_id = 0 } = request.query;
+
+    if (!board_id) return response.send();
 
     let users = [];
 
     if (param)
-      users = await knex.select('*').from('user').where('name', 'ilike', '%' + String(param) + '%').orWhere('email', 'ilike', '%' + String(param) + '%').limit(20);
-    else
-      users = await knex.select('*').from('user').limit(20);  
+      users = await knex
+        .select("*")
+        .from("user")
+        .join("user_board", "user._id", "=", "user_board.user_id")
+        .where("user_board.board_id", "<>", Number(board_id))
+        .andWhere("name", "ilike", "%" + String(param) + "%")
+        .orWhere("email", "ilike", "%" + String(param) + "%")
+        .limit(20);
+    else users = await knex.select("*").from("user").limit(20);
 
     return response.json(users);
+  }
+
+  async findUser(request: Request, response: Response) {
+    const { param, added } = request.query;
+
+    let users: User[] = [];
+
+    if (param && added) {
+      let addedIds = (added as string).split(",");
+      users = await knex
+        .select("*")
+        .from("user")
+        .whereRaw("_id not in (" + addedIds + ")")
+        .andWhereRaw(`(name like '%${String(param)}%' or email like  '%${String(param)}%')`)
+        .limit(20);
+    }
+    // else users = await knex.select("*").from("user").limit(20);
+
+    return response.json(users);
+  }
+
+  async updateUser(request: Request, response: Response) {
+    const { _id, username, email, name } = request.body;
+    await knex("user").where({ _id }).update({ username, email, name });
+    return response.status(200).send();
   }
 }
 

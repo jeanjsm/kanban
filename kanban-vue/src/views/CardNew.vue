@@ -1,34 +1,47 @@
 <template>
   <div class="card" @click="loadCard">
-    <div v-if="card.label">
-      <v-chip
-        :color="card.label.color"
-        :dark="card.label.color !== '#FFFFFF'"
-        :outlined="card.label.color === '#FFFFFF'"
-        x-small
-        >{{ card.label.name }}</v-chip
-      >
-    </div>
-    <p class="">
-      {{ card.title }}
-    </p>
-    <div class="member">
-      <Avatar :user="card.owner"></Avatar>
+    <div class="d-flex justify-space-between">
+      <div class="subtitle-2 font-weight-bold text-uppercase">
+        {{ card.title }}
+      </div>
       <v-menu offset-y>
         <template v-slot:activator="{ on }">
-            <v-btn v-on="on" elevation="0" icon small>
-              <v-icon>mdi-dots-horizontal</v-icon>
-            </v-btn>
-          </template>
-          <v-card>
-            <v-list dense>
-              <v-list-item @click="remove">
+          <v-btn v-on="on" elevation="0" icon small>
+            <v-icon>mdi-dots-horizontal</v-icon>
+          </v-btn>
+        </template>
+        <v-card elevation="0">
+          <v-list dense>
+            <v-list-item @click="showChangeTitle = !showChangeTitle">
+              <v-list-item-avatar>
+                <v-icon>mdi-pencil</v-icon>
+              </v-list-item-avatar>
+              Alterar Título
+            </v-list-item>
+            <v-list-item @click="checkRemove">
+              <v-list-item-avatar>
                 <v-icon>mdi-delete</v-icon>
-                Delete
-              </v-list-item>
-            </v-list>
-          </v-card>
+              </v-list-item-avatar>
+              Remover cartão
+            </v-list-item>
+          </v-list>
+        </v-card>
       </v-menu>
+    </div>
+
+    <div class="member">
+      <v-avatar size="24" color="teal" class="white--text">{{
+        card.owner | initials
+      }}</v-avatar>
+      <div v-if="card.label">
+        <v-chip
+          :color="card.label.color"
+          :dark="card.label.color !== '#FFFFFF'"
+          :outlined="card.label.color === '#FFFFFF'"
+          x-small
+          >{{ card.label.name }}</v-chip
+        >
+      </div>
     </div>
     <div class="card-footer">
       <div class="footer-date">
@@ -60,6 +73,14 @@
     <v-dialog width="1024" v-model="showDetails">
       <card-detail @close="showDetails = false" :card="detail" />
     </v-dialog>
+    <ConfirmDialog
+      @on-confirm="remove"
+      v-if="showConfirm"
+      @on-decline="closeRemove"
+      :maxWidth="500"
+    >
+      Tem certeza que deseja remover o cartão {{ card.title }}?
+    </ConfirmDialog>
   </div>
 </template>
 
@@ -67,11 +88,10 @@
 import moment from "moment";
 import CardService from "../services/card.service";
 import CardDetail from "../views/CardDetail";
-import Avatar from "../components/Avatar";
 export default {
   components: {
     CardDetail,
-    Avatar
+    ConfirmDialog: () => import("../components/ConfirmDialog")
   },
   props: {
     card: {}
@@ -79,20 +99,34 @@ export default {
   data() {
     return {
       showDetails: false,
-      detail: {}
+      detail: {},
+      enableOpenCard: true,
+      showChangeTitle: true,
+      hoverCard: false,
+      showConfirm: false
     };
   },
   mounted() {},
   methods: {
     async loadCard() {
-      const { data } = await CardService.findCard(this.card._id);
-      this.detail = data;
-      this.showDetails = true;
-      this.$store.dispatch("app/setCardSelected", data);
+      if (this.enableOpenCard) {
+        const { data } = await CardService.findCard(this.card._id);
+        this.detail = data;
+        this.showDetails = true;
+        this.$store.dispatch("app/setCardSelected", data);
+      }
+    },
+    checkRemove() {
+      this.showConfirm = true;
+    },
+    closeRemove() {
+      this.showConfirm = false;
     },
     async remove() {
       await CardService.delete(this.card);
       this.$store.commit("app/removeCardFromList", this.card);
+      this.closeRemove();
+      this.$notification.showSuccess("Cartão removido com sucesso!");
     },
     parseData(date) {
       return moment(date)
@@ -112,6 +146,9 @@ export default {
   background-color: #ffffff;
   border-radius: 0.375rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+.card:hover {
+  background-color: #ececec;
 }
 .card p {
   /* text-sm font-medium leading-snug text-gray-900 */

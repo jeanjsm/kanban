@@ -1,5 +1,5 @@
 <template>
-  <div class="board">
+  <div class="board" >
     <div class="board-header">
       <div class="d-flex align-center">
         <v-btn color="blue darken-2" outlined text :to="{ name: 'app.home' }">
@@ -12,32 +12,10 @@
 
         <div class="board-members">
           <span v-for="user in boardUsers" :key="user._id" class="board-member">
-            <Avatar :user="user" />
+            <v-avatar size="32" color="teal" class="board-avatar">
+              <span class="white--text">{{ user | initials }}</span>
+            </v-avatar>
           </span>
-          <!-- <span class="board-member">
-            <img
-              src="https://api.adorable.io/avatars/196/abott@adorable.png"
-              alt=""
-            />
-          </span>
-          <span class="board-member">
-            <img
-              src="https://api.adorable.io/avatars/196/abott@adorable.png"
-              alt=""
-            />
-          </span>
-          <span class="board-member">
-            <img
-              src="https://api.adorable.io/avatars/196/abott@adorable.png"
-              alt=""
-            />
-          </span>
-          <span class="board-member">
-            <img
-              src="https://api.adorable.io/avatars/196/abott@adorable.png"
-              alt=""
-            />
-          </span> -->
           <span class="board-member">
             <v-btn
               color="primary"
@@ -68,7 +46,7 @@
                 <span class="d-flex justify-center">Não há dados</span>
               </template>
             </v-autocomplete>
-            <v-btn class="mt-1" depressed>Adicionar</v-btn>
+            <v-btn class="mt-1" depressed @click="addMember">Adicionar</v-btn>
           </span>
         </div>
       </div>
@@ -83,13 +61,13 @@
             @click="enableAddList = !enableAddList"
           >
             <v-icon>mdi-plus</v-icon>
-            <span>Add List</span>
+            <span>Adicionar Lista</span>
           </v-btn>
           <div id="addList">
             <div class="add-list" v-if="enableAddList">
               <v-text-field
                 v-model="newListTitle"
-                label="Type a title for this list..."
+                label="Insira um título"
                 outlined
                 hide-details
                 dense
@@ -128,11 +106,10 @@ import List from "./List";
 import ListService from "../services/list.service";
 import BoardService from "../services/board.service";
 import AuthService from "../services/auth.service";
-import Avatar from "../components/Avatar";
+// import axios from "axios";
 export default {
   components: {
-    List,
-    Avatar
+    List
   },
   data() {
     return {
@@ -144,7 +121,8 @@ export default {
       boardUsers: [],
       users: [],
       selectedUser: {},
-      searchableUser: null
+      searchableUser: null,
+      imageSource: ""
     };
   },
   computed: {
@@ -184,6 +162,14 @@ export default {
     if (id === undefined) {
       this.$router.push({ name: "app.home" });
     }
+
+    // await axios
+    //   .get(`https://source.unsplash.com/${window.innerWidth}x${window.innerHeight}/?nature,wallpapers`)
+    //   .then(result => {
+    //     console.log(result.request.responseURL);
+    //     // this.imageSource = result.request.responseURL;
+    //     this.imageSource = `https://images.unsplash.com/photo-1592490309181-bc4951396f30?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=${window.innerWidth}&fit=max&ixid=eyJhcHBfaWQiOjcwNjZ9`;
+    //   });
     const { data } = await BoardService.findById(id);
     this.board = data;
     this.$store.dispatch("app/loadBoard", id);
@@ -201,7 +187,8 @@ export default {
       try {
         const list = {
           board_id: this.board._id,
-          title: this.newListTitle
+          title: this.newListTitle,
+          order: this.lists.length + 1
         };
         const { data } = await ListService.createList(list, this.user._id);
         // this.lists.push(data);
@@ -217,13 +204,19 @@ export default {
       this.boardUsers = data;
     },
     findUser: _.debounce(async function findUser(query) {
-      const { data } = await AuthService.findUser(query);
+      let idsUsersAdded = this.boardUsers.map(boardUser => {
+        return boardUser._id;
+      })
+      const { data } = await AuthService.findUser(query, idsUsersAdded);
+      console.log(data);
       this.users = data;
     }),
     async addMember() {
       try {
         await BoardService.addMember(this.board._id, this.selectedUser._id);
         this.$notification.showSuccess("Membro adicionado com sucesso!");
+        this.loadBoardUsers();
+        this.enableAddMember = false;
       } catch (err) {
         this.$notification.showError(err);
       }
@@ -239,6 +232,7 @@ export default {
   flex-direction: column;
   overflow: hidden;
   height: calc(100vh - 64px);
+  /* background-image: url('https://images.unsplash.com/photo-1547014751-009831e5bc73?ixlib=rb-1.2.1&auto=format&fit=crop&w=2300&q=80'); */
 }
 .board-header {
   /* flex items-center justify-between py-2 mx-2 */
@@ -270,6 +264,10 @@ export default {
   margin-left: -0.5rem;
   border-radius: 9999px;
   top: 4px;
+}
+.board-member .board-avatar {
+  object-fit: cover;
+  border: 2px solid #ffffff !important;
 }
 .board-member img {
   width: 32px;

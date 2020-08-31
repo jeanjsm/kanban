@@ -3,28 +3,20 @@
     <div class="login ma-auto">
       <v-card width="500">
         <v-card-title class="">
-          <h2>Kanban Login</h2>
+          <h2>Quadros</h2>
         </v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="user.email"
-            type="email"
-            outlined
-            label="Login"
-            placeholder="Enter email"
-            dense
-          ></v-text-field>
-          <v-text-field
-            v-model="user.password"
-            outlined
-            label="Password"
-            placeholder="Enter password"
-            type="password"
-            dense
-          ></v-text-field>
-          <v-btn color="primary" block @click="authenticate">Login</v-btn>
-          <v-divider class="my-4"></v-divider>
-          <v-btn disabled text small>Forget Login</v-btn>
+          <v-tabs fixed-tabs>
+            <v-tab>Login</v-tab>
+            <v-tab>Cadastro</v-tab>
+
+            <v-tab-item class="mt-6">
+              <login></login>
+            </v-tab-item>
+            <v-tab-item class="mt-6">
+              <register></register>
+            </v-tab-item>
+          </v-tabs>
         </v-card-text>
       </v-card>
     </div>
@@ -32,40 +24,18 @@
 </template>
 
 <script>
-import AuthService from "../services/auth.service";
 export default {
+  components: {
+    Login: () => import("../components/Login"),
+    Register: () => import("../components/Register")
+  },
   data() {
-    return {
-      user: {
-        login: "",
-        password: ""
-      }
-    };
-  },
-  mounted() {
-    this.$store.commit("user/clear");
-    this.$store.commit("auth/clear");
-  },
-  methods: {
-    async authenticate() {
-      await AuthService.authenticate(this.user)
-        .then(response => {
-          this.$store.dispatch("auth/login", response.data);
-          this.$store.dispatch("user/setUser", response.data.user);
-          this.$store.dispatch("user/setToken", response.data.token);
-          this.$router.push({ name: "app.home" });
-        })
-        .catch(err => {
-          this.$notification.showError(err.response.data.error);
-        });
-    }
+    return {};
   }
 };
 </script>
 
 <style scoped>
-.login-container {
-}
-.login {
+.tabs {
 }
 </style>

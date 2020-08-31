@@ -2,14 +2,14 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Store from '../store';
 // import LayoutBase from '../layouts/App.vue';
-import routeAuth from './routes/auth';
+import { login } from './routes/auth';
 import routeApp from './routes/app';
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
-  mode: 'history',
-  routes: [ routeAuth, routeApp ]
+  // mode: 'history',
+  routes: [ login, routeApp ]
 });
 
 router.beforeEach((to, from, next) => {

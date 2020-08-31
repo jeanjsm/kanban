@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <v-container class="grey lighten-5">
+    <v-container>
       <v-row class="mb-6">
         <v-col v-for="board in boards" :key="board._id" :md="3" :sm="6">
           <v-card class="pa-6 board" @click="enter(board)">{{

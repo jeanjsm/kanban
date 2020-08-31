@@ -1,57 +1,54 @@
 <template>
-  <v-flex >
-    <v-card color="primary lighten-1 white--text" class="details">
-      <v-card-title>
-        <div class="details-title">
-          <div>
-            <span class="headline">{{ card.title }}</span>
-          </div>
-          <div>
-            <v-btn class="close" icon @click="close">X</v-btn>
-          </div>
+  <v-card height="100vh">
+    <v-card-title class="details">
+      <div class="details-title">
+        <div>
+          <span class="headline">{{ card.title }}</span>
         </div>
-      </v-card-title>
-      <v-card-subtitle class="white--text">
-        <span>Criado por: {{ user.name }}</span>
-      </v-card-subtitle>
-    </v-card>
-    <v-card>
-      <v-card-text class="details details-body">
-        <div class="details-main">
-          <Labels class="mb-2" :card="card" :label="label"></Labels>
-          <div class="description">
-            <div class="d-flex">
-              <svg
-                class="mr-2"
-                style="width:24px;height:24px"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill="currentColor"
-                  d="M4,5H20V7H4V5M4,9H20V11H4V9M4,13H20V15H4V13M4,17H14V19H4V17Z"
-                />
-              </svg>
-              <h2 class="section-title">Descrição</h2>
-            </div>
-            <v-textarea
-              v-model="description"
-              label="Adicione uma descrição detalhada"
-              solo
-              hide-details
-
-            ></v-textarea>
-            <v-btn
-              :disabled="enableSaveDescription"
-              class="description-button"
-              color="success"
-              elevation="0"
-              small
-              @click="save"
-              >Salvar</v-btn
+        <div>
+          <v-btn class="close" icon @click="close">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </div>
+      </div>
+    </v-card-title>
+    <v-card-subtitle class="details">
+      <span>Criado por: {{ card.owner.name }}</span>
+    </v-card-subtitle>
+    <v-card-text class="details details-body">
+      <div class="details-main">
+        <Labels class="mb-2" :card="card" :label="label"></Labels>
+        <div class="description">
+          <div class="d-flex">
+            <svg
+              class="mr-2"
+              style="width:24px;height:24px"
+              viewBox="0 0 24 24"
             >
+              <path
+                fill="currentColor"
+                d="M4,5H20V7H4V5M4,9H20V11H4V9M4,13H20V15H4V13M4,17H14V19H4V17Z"
+              />
+            </svg>
+            <h2 class="section-title">Descrição</h2>
           </div>
+          <v-textarea
+            v-model="description"
+            label="Adicione uma descrição detalhada"
+            solo
+            hide-details
+          ></v-textarea>
+          <v-btn
+            :disabled="enableSaveDescription"
+            class="description-button"
+            color="success"
+            elevation="0"
+            small
+            @click="save"
+            >Salvar</v-btn
+          >
         </div>
-      </v-card-text>
+      </div>
       <v-divider></v-divider>
       <div class="tabs">
         <v-tabs grow>
@@ -127,8 +124,8 @@
           </v-tab-item>
         </v-tabs>
       </div>
-    </v-card>
-  </v-flex>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>

@@ -5,12 +5,12 @@ import Label from "../models/Label";
 
 export default class CardController {
   async index(request: Request, response: Response) {
-    const { list_id } = request.query;  
+    const { list_id } = request.query;
     const list = await knex.select('*').from('list').where('_id', Number(list_id)).first();
 
     if (!list)
       return response.status(400).send({ error: 'List does not exists' });
-    
+
     let cards = await knex.select('*').from('card').where('list_id', Number(list_id));
 
     for (let index in cards) {
@@ -29,11 +29,15 @@ export default class CardController {
     const { card_id } = request.params;
 
     let card: Card = await knex.select('*').from('card').where('_id', card_id).first();
-    
+
     const label: Label = await knex.select('*').from('label').where('_id', Number(card.label_id)).first();
+
+    const owner = await knex.select('name').from('user').join('user_card', 'user._id', '=', 'user_card.user_id').where('user_card.card_id', card._id).andWhere('user_card.owner', true).first();
 
     if (label)
       card.label = label;
+    if (owner)
+      card.owner = owner;
     return response.send(card);
   }
 
@@ -42,7 +46,7 @@ export default class CardController {
 
     if (!card_id)
       return response.status(400).send({ error: 'No parameters informed' });
-   
+
     let description = await knex.select('description').from('card').where('_id', Number(card_id)).first();
     return response.send(description);
   }
@@ -55,7 +59,7 @@ export default class CardController {
 
     if (!user)
       return response.status(400).send({ error: 'User does not exists' });
-    
+
     const list = knex.select('*').from('list').where('_id', Number(list_id)).first();
     if (!list)
       return response.status(400).send({ error: 'List does not exists' });
@@ -78,8 +82,9 @@ export default class CardController {
     if (newCard.label) {
       newCard.label_id = newCard.label._id;
       delete newCard.label;
+      await knex('card').update('label_id', newCard.label_id).where('_id', Number(newCard._id));
     }
-    await knex('card').update('label_id', newCard.label_id).where('_id', Number(newCard._id));
+    await knex('card').update('list_id', newCard.list).where('_id', Number(newCard._id));
     return response.send(newCard);
   }
 
@@ -99,8 +104,14 @@ export default class CardController {
   }
 
   async delete(request: Request, response: Response) {
-    const { id } = request.body;
-    await knex('card').where('_id', id).del();
-    return response.send({ message: 'Successfully saved.' });
+    const { id } = request.query;
+    knex.transaction(async function(trx) {
+      await trx('user_card').where('card_id', Number(id)).del();
+      await trx('card').where('_id', Number(id)).del();
+    }).then(res => {
+      return response.status(200).send();
+    }).catch(error => {
+      return  response.status(400).json({ message: error })
+    });
   }
 }

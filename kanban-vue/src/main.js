@@ -7,6 +7,8 @@ import vuetify from './plugins/vuetify';
 import Timeago from './plugins/VueTimeago';
 import './global.css';
 
+import './filters/initials';
+
 import './commons/utils';
 import './plugins';
 Vue.prototype.$blogName = 'LogRocket'

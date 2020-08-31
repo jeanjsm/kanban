@@ -9,5 +9,9 @@ export default interface Card {
   label_id: Number,
   createdAt: Date,
   updatedAt: Date,
-  label: Label
+  label: Label,
+  owner: {
+    type: Object,
+    default: null
+  }
 }
