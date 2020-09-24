@@ -74,7 +74,7 @@ class AuthController {
 
     if (!board_id) return response.send();
 
-    let users = [];
+    let users = Array();
 
     if (param)
       users = await knex
@@ -101,7 +101,9 @@ class AuthController {
         .select("*")
         .from("user")
         .whereRaw("_id not in (" + addedIds + ")")
-        .andWhereRaw(`(name like '%${String(param)}%' or email like  '%${String(param)}%')`)
+        .andWhereRaw(
+          `(name like '%${String(param)}%' or email like  '%${String(param)}%')`
+        )
         .limit(20);
     }
     // else users = await knex.select("*").from("user").limit(20);
