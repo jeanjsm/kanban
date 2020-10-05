@@ -7,3 +7,4 @@
 kanban-api/node_modules/
 kanban-api/tmp/uploads/*
 kanban-service/node_modules/
+/kanban-vue/.env

@@ -7,7 +7,7 @@ import bcrypt from "bcrypt";
 class AuthController {
   async register(request: Request, response: Response) {
     try {
-      const { name, email, password } = request.body;
+      const { name, username, email, password } = request.body;
 
       let users = await knex("user").where("email", email);
 
@@ -17,6 +17,7 @@ class AuthController {
 
       const insertedId = await knex("user").returning("_id").insert({
         name,
+        username,
         email,
       });
 
@@ -31,7 +32,6 @@ class AuthController {
 
       const user: User = await knex("user").where("_id", userId).first();
 
-      console.log(user);
       const auth = new Auth();
 
       return response.json({
@@ -39,7 +39,6 @@ class AuthController {
         token: auth.generateToken({ id: user._id }),
       });
     } catch (err) {
-      console.log(err);
       return response.status(400).send({ error: err });
     }
   }
@@ -63,8 +62,6 @@ class AuthController {
     }
     user.password = undefined;
     user.createdAt = undefined;
-
-    console.log(user);
 
     return response.send({ user, token: auth.generateToken({ user: user }) });
   }

@@ -1,14 +1,20 @@
-import knex from 'knex';
+import "dotenv/config";
+import knex from "knex";
+
+const host = process.env.HOST;
+const user = process.env.USER;
+const password = process.env.PASSWORD;
+const database = process.env.DATABASE;
 
 const connection = knex({
-  client: 'pg',
-  version: '9.6',
+  client: "pg",
+  version: "9.6",
   connection: {
-    host : '127.0.0.1',
-    user : 'postgres',
-    password : 'postgres',
-    database : 'boards'
+    host,
+    user,
+    password,
+    database,
   },
-})
+});
 
 export default connection;

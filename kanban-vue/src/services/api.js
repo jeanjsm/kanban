@@ -2,7 +2,7 @@ import axios from "axios";
 import store from "../store";
 
 const config = {
-  baseURL: "http://localhost:3333"
+  baseURL: process.env.HOST
 };
 
 const api = axios.create(config);

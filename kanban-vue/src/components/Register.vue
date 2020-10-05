@@ -1,8 +1,5 @@
 <template>
-  <ValidationObserver
-    ref="obs"
-    v-slot="{ invalid, validated }"
-  >
+  <ValidationObserver ref="obs" v-slot="{ invalid, validated }">
     <form autocomplete="off" @submit.prevent="register">
       <v-text-field
         v-model="user.name"
@@ -11,6 +8,17 @@
         dense
         required
       ></v-text-field>
+      <ValidationProvider rules="required" v-slot="{ errors }">
+        <v-text-field
+          v-model="user.username"
+          label="Username"
+          autocomplete="chrome-off"
+          :error-messages="errors"
+          outlined
+          dense
+          required
+        ></v-text-field>
+      </ValidationProvider>
       <ValidationProvider rules="required|email" v-slot="{ errors }">
         <v-text-field
           v-model="user.email"
@@ -47,7 +55,14 @@
       </ValidationProvider>
       <v-divider></v-divider>
       <v-card-actions>
-        <v-btn type="submit" color="success" class="mx-auto" block :disabled="invalid || !validated">Cadastrar</v-btn>
+        <v-btn
+          type="submit"
+          color="success"
+          class="mx-auto"
+          block
+          :disabled="invalid || !validated"
+          >Cadastrar</v-btn
+        >
       </v-card-actions>
     </form>
   </ValidationObserver>
